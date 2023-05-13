@@ -38,6 +38,9 @@ if (i18n.language !== "en" || i18n.language !== "tr") {
   if (i18n.language.slice(0, 2) === "tr") {
     localStorage.setItem("i18nextLng", "tr");
     i18n.changeLanguage("tr");
+  } else if (i18n.language.slice(0, 2) === "es") {
+    localStorage.setItem("i18nextLng", "es");
+    i18n.changeLanguage("es");
   } else {
     localStorage.setItem("i18nextLng", "en");
     i18n.changeLanguage("en");
