@@ -29,35 +29,28 @@ const JoinModes = {
   MCU: "mcu"
 }
 
-
 var token = getUrlParameter("token");
 var mcuEnabled = getUrlParameter("mcuEnabled");
 var InitialStreamId = getUrlParameter("streamId");
 var playOnly = getUrlParameter("playOnly");
 var subscriberId = getUrlParameter("subscriberId");
 var subscriberCode = getUrlParameter("subscriberCode");
+var allowCamera = getUrlParameter("allowCamera") ?? false;
+var streamName = getUrlParameter("userName")+(allowCamera?"H0s999":""); 
 var scrollThreshold = -Infinity;
 var scroll_down=true;
 
-var videoQualityConstraints = {
-  video: {
-    width: { max: 320 },
-    height: { max: 240 },
-  }
-}
 
-var audioQualityConstraints = {
+var mediaConstraints = {
   audio: {
     noiseSuppression: true,
     echoCancellation: true
   }
-}
-
-var mediaConstraints = {
-  // setting constraints here breaks source switching on firefox.
-  video: videoQualityConstraints.video,
-  audio: audioQualityConstraints.audio,
 };
+
+if(allowCamera){
+  mediaConstraints.video={}
+}
 
 let websocketURL = process.env.REACT_APP_WEBSOCKET_URL;
 
@@ -116,9 +109,6 @@ function AntMedia() {
 
   const [publishStreamId, setPublishStreamId] = useState(InitialStreamId);
 
-  // this is my own name when i enter the room.
-  const [streamName, setStreamName] = useState("");
-
   // this is for checking if i am sharing my screen with other participants.
   const [isScreenShared, setIsScreenShared] = useState(false);
 
@@ -154,7 +144,7 @@ function AntMedia() {
   const [cam, setCam] = useState([
     {
       eventStreamId: "localVideo",
-      isCameraOn: true, //start with camera on
+      isCameraOn: allowCamera?true:false, //start with camera on
     },
   ]);
   const [isPlayOnly] = React.useState(playOnly);
@@ -188,12 +178,13 @@ function AntMedia() {
     let isVideoDeviceAvailable = false;
     let isAudioDeviceAvailable = false;
     let selectedDevices = getSelectedDevices();
+    console.log("Selected devs:", selectedDevices)
     let currentCameraDeviceId = selectedDevices.videoDeviceId;
     let currentAudioDeviceId = selectedDevices.audioDeviceId;
 
     // check if the selected devices are still available
     for (let index = 0; index < devices.length; index++) {
-      if (devices[index].kind === "videoinput" && devices[index].deviceId === selectedDevices.videoDeviceId) {
+      if (allowCamera && devices[index].kind === "videoinput" && devices[index].deviceId === selectedDevices.videoDeviceId) {
         isVideoDeviceAvailable = true;
       }
       if (devices[index].kind === "audioinput" && devices[index].deviceId === selectedDevices.audioDeviceId) {
@@ -202,7 +193,7 @@ function AntMedia() {
     }
 
     // if the selected devices are not available, select the first available device
-    if (selectedDevices.videoDeviceId === '' || isVideoDeviceAvailable === false) {
+    if (allowCamera && selectedDevices.videoDeviceId === '' || isVideoDeviceAvailable === false) {
       const camera = devices.find(d => d.kind === 'videoinput');
       if (camera) {
         selectedDevices.videoDeviceId = camera.deviceId;
@@ -217,7 +208,7 @@ function AntMedia() {
 
     setSelectedDevices(selectedDevices);
 
-    if (webRTCAdaptor !== null && currentCameraDeviceId !== selectedDevices.videoDeviceId) {
+    if (allowCamera && webRTCAdaptor !== null && currentCameraDeviceId !== selectedDevices.videoDeviceId) {
       webRTCAdaptor.switchVideoCameraCapture(publishStreamId, selectedDevices.videoDeviceId);
     }
     if (webRTCAdaptor !== null && (currentAudioDeviceId !== selectedDevices.audioDeviceId || selectedDevices.audioDeviceId === 'default')) {
@@ -245,6 +236,7 @@ function AntMedia() {
 
   function reconnect() {
     console.log("reconnect required");
+
     webRTCAdaptor.closePeerConnection(publishStreamId);
     webRTCAdaptor.closeWebSocket();
 
@@ -262,10 +254,15 @@ function AntMedia() {
   }
 
   function joinRoom(roomName, generatedStreamId, roomJoinMode) {
-    webRTCAdaptor.joinRoom(roomName, generatedStreamId, roomJoinMode);
+    if(webRTCAdaptor){
+      console.log(webRTCAdaptor)
+      webRTCAdaptor.joinRoom(roomName, generatedStreamId, roomJoinMode);
+    }
   }
 
   useEffect(() => {
+    console.log("Recreating adaptor: ", websocketURL, recreateAdaptor, webRTCAdaptor, mediaConstraints)
+    console.log("ok.")
     if (recreateAdaptor && webRTCAdaptor == null) {
       setWebRTCAdaptor(new WebRTCAdaptor({
         websocket_url: websocketURL,
@@ -434,52 +431,52 @@ function AntMedia() {
     errorMessage = JSON.stringify(error);
     if (error.indexOf("NotFoundError") !== -1) {
       errorMessage =
-        "Camera or Mic are not found or not allowed in your device.";
+        "No se encontraron camara o microfono o no son accesibles.";
       alert(errorMessage);
     } else if (
       error.indexOf("NotReadableError") !== -1 ||
       error.indexOf("TrackStartError") !== -1
     ) {
       errorMessage =
-        "Camera or Mic is being used by some other process that does not not allow these devices to be read.";
+        "La camara o microfono estan siendo usados por otro programa o servicio, por eso no se ha podido acceder.";
       alert(errorMessage);
     } else if (
       error.indexOf("OverconstrainedError") !== -1 ||
       error.indexOf("ConstraintNotSatisfiedError") !== -1
     ) {
       errorMessage =
-        "There is no device found that fits your video and audio constraints. You may change video and audio constraints.";
+        "No hay dispositivo que cumpla con los requisitos. You may change video and audio constraints.";
       alert(errorMessage);
     } else if (
       error.indexOf("NotAllowedError") !== -1 ||
       error.indexOf("PermissionDeniedError") !== -1
     ) {
-      errorMessage = "You are not allowed to access camera and mic.";
+      errorMessage = "No tienes permisos para acceder a la camara o microfono";
       handleScreenshareNotFromPlatform();
     } else if (error.indexOf("TypeError") !== -1) {
-      errorMessage = "Video/Audio is required.";
+      errorMessage = "Video/Audio es requerido.";
       webRTCAdaptor.mediaManager.getDevices();
     } else if (error.indexOf("UnsecureContext") !== -1) {
       errorMessage =
-        "Fatal Error: Browser cannot access camera and mic because of unsecure context. Please install SSL and access via https";
+        "Error fatal: El navegador no puede acceder a la camara y microfono en un entorno no seguro. Por favor instala y configura SSL";
     } else if (error.indexOf("WebSocketNotSupported") !== -1) {
-      errorMessage = "Fatal Error: WebSocket not supported in this browser";
+      errorMessage = "Error fatal, este navegador no soporta websockets";
     } else if (error.indexOf("no_stream_exist") !== -1) {
       //TODO: removeRemoteVideo(error.streamId);
     } else if (error.indexOf("data_channel_error") !== -1) {
       errorMessage = "There was a error during data channel communication";
     } else if (error.indexOf("ScreenSharePermissionDenied") !== -1) {
-      errorMessage = "You are not allowed to access screen share";
+      errorMessage = "No tienes permitido compartir pantalla.";
       handleScreenshareNotFromPlatform();
     } else if (error.indexOf("WebSocketNotConnected") !== -1) {
-      errorMessage = "WebSocket Connection is disconnected.";
+      errorMessage = "No se pudo conectar al wsservicio";
     } else if (error.indexOf("highResourceUsage") !== -1) {
       reconnect();
       startAutoRepublishTimer();
+    }else if (error.indexOf("AbortError") !== -1) {
+      setRecreateAdaptor(true);
     }
-
-
-    console.log("***** " + error)
+    console.log("***** ", error, errorMessage)
 
   };
 
@@ -1032,6 +1029,18 @@ function AntMedia() {
     webRTCAdaptor.play(obj.streamId, "", roomName);
   }
   function handlePublish(publishStreamId, token, subscriberId, subscriberCode) {
+    
+    console.log(
+      "Publishing:",
+      publishStreamId,
+      token,
+      subscriberId,
+      subscriberCode,
+      streamName,
+      roomName,
+      "{someKey:somveValue}"
+    )
+
     webRTCAdaptor.publish(
       publishStreamId,
       token,
@@ -1142,7 +1151,9 @@ function AntMedia() {
     }
   }
   function handleRoomEvents({ streams, streamList }) {
-    console.log(allParticipants);
+    console.log("DBG: All participants:", allParticipants);
+    console.log("DBG: incoming Stream list", streamList)
+    console.log("DBG: incoming Streams", streams)
     // [allParticipant, setAllParticipants] => list of every user
     setAllParticipants(streamList);
     // [participants,setParticipants] => number of visible participants due to tile count. If tile count is 3
@@ -1222,7 +1233,7 @@ function AntMedia() {
     webRTCAdaptor.enableAudioLevelForLocalStream(listener, period);
   }
 
-  return (!initialized ? <>hello</> :
+  return (!initialized ? <>Hello. :)</> :
     <Grid container className="App">
       <Grid
         container
@@ -1257,7 +1268,7 @@ function AntMedia() {
             initialized,
             devices,
             publishStreamId,
-
+            allowCamera,
             setSelectedBackgroundMode,
             setIsVideoEffectRunning,
             setParticipants,
@@ -1285,7 +1296,6 @@ function AntMedia() {
             pinVideo,
             setLocalVideo,
             setWaitingOrMeetingRoom,
-            setStreamName,
             handleLeaveFromRoom,
             handleSendNotificationEvent,
             reconnect,

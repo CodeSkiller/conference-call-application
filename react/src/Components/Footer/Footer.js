@@ -15,7 +15,6 @@ import { useParams } from "react-router-dom";
 import { ConferenceContext } from 'pages/AntMedia';
 import ReconnectButton from './Components/ReconnectButton';
 
-
 const CustomizedGrid = styled(Grid)(({ theme }) => ({
   backgroundColor: theme.palette.green[80],
   position: "absolute",
@@ -29,7 +28,6 @@ const CustomizedGrid = styled(Grid)(({ theme }) => ({
 function Footer(props) {
   const { id } = useParams();
   const conference = React.useContext(ConferenceContext);
-
     return (
         <CustomizedGrid
             container
@@ -38,13 +36,11 @@ function Footer(props) {
         >
           <Grid item sx={{display: {xs: "none", sm: "block"}}}>
             <Grid container alignItems={"center"}>
-              <a href="https://portmeet.com/" alt="portmeet website" target="_blank" rel="noreferrer">
-                <img src="./favicon-32x32.png" alt="portmeet logo" style={{width: '22px', marginRight: 4}}/>
-              </a>
+
+              <InfoButton/> 
               <Typography color="#ffffff" variant="body1">
-                {id}
+                Sala: {id}
               </Typography>
-              <InfoButton/>
             </Grid>
           </Grid>
               <Grid item>
@@ -57,7 +53,7 @@ function Footer(props) {
                     <OptionButton footer/>
                   </Grid>
 
-                  {conference.isPlayOnly === false ?
+                  {conference.allowCamera && conference.isPlayOnly === false ?
                   <Grid item xs={0}>
                     <CameraButton {...props} footer/>
                   </Grid>
@@ -69,7 +65,7 @@ function Footer(props) {
                   </Grid>
                       : null}
 
-                  {conference.isPlayOnly === false ?
+                  {conference.allowCamera && conference.isPlayOnly === false ?
                   <Grid item xs={0}>
                     {" "}
                     <ShareScreenButton footer/>

@@ -28,7 +28,7 @@ const SnackMessage = forwardRef((props, ref) => {
   }, [closeSnackbar]);
 
   return (
-    <AntSnackContent ref={ref}>
+    <AntSnackContent ref={ref} onClick={handleDismiss}>
       {notificationData.variant === 'info' && (
         <AntSnackInfo container justifyContent={'center'} alignItems={'center'}>
           {notificationData.icon && (

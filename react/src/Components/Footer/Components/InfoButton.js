@@ -34,7 +34,6 @@ function InfoButton(props) {
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const meetingLink = window.location.href;
 
   const getResolution = () => {
       // Sometimes, it takes some time to get the video track. So, we have to try catch it.
@@ -79,36 +78,8 @@ function InfoButton(props) {
                 horizontal: 'left',
               }}
           >
-            <Typography variant="body2" sx={{px: 1.5, py: 0.5, fontSize: 14, fontWeight: 700}} color="#fff">
-              {t('Meeting link')}
-            </Typography>
-            <StyledMenuItem>
-              <StyledListItemText>{meetingLink.replace(/^https?:\/\//, '')}</StyledListItemText>
-              <ListItemIcon sx={{pl: 1, cursor: 'pointer'}}>
-                <Tooltip title={t('Copy meeting link')} placement="top">
-                  <Button
-                      sx={{minWidth: 'unset', px: 1.5, py: 0.5}}
-                      variant="text"
-                      onClick={() => {
-                        navigator.clipboard.writeText(meetingLink);
-                        enqueueSnackbar(
-                            {
-                              message: t('Link copied'),
-                              variant: 'info',
-                            },
-                            {
-                              autoHideDuration: 1500,
-                            }
-                        );
-                      }}
-                  >
-                    <SvgIcon size={14} viewBox="0 0 500 1000" name={'copy'} color={'white'}/>
-                  </Button>
-                </Tooltip>
-              </ListItemIcon>
-            </StyledMenuItem>
 
-              {conference.isPlayOnly === false ?
+              {conference.allowCamera && conference.isPlayOnly === false ?
             <Typography variant="body2" sx={{px: 1.5, py: 0.5, fontSize: 14, fontWeight: 700}} color="#fff">
               {t('Resolution')}
             </Typography>

@@ -267,7 +267,7 @@ const MeetingRoom = React.memo((props) => {
                           }}
                           id="localVideo"
                           autoPlay
-                          name="You"
+                          name="Tu"
                           muted
                       />
                     </div>
@@ -331,17 +331,13 @@ const MeetingRoom = React.memo((props) => {
                         width: "var(--width)",
                         height: "var(--height)",
                         maxWidth: "var(--maxwidth)",
+                        display: (conference.allowCamera ? "block" :"none")
                       }}
                   >
                     <VideoCard
-                        onHandlePin={() => {
-                          conference.pinVideo("localVideo", "localVideo");
-                        }}
                         id="localVideo"
                         autoPlay
-                        name="You"
-                        muted
-                        hidePin={conference.participants.length === 0}
+                        name="Tu."
                     />
                   </div> : null}
                   {conference.participants
@@ -364,7 +360,7 @@ const MeetingRoom = React.memo((props) => {
                                   id={id}
                                   track={track}
                                   autoPlay
-                                  name={name}
+                                  name={name.replace("H0s999", "")}
                               />
                             </div>
                           </>
@@ -395,7 +391,7 @@ const MeetingRoom = React.memo((props) => {
                             }}
                             id="localVideo"
                             autoPlay
-                            name="You"
+                            name="Tu"
                             muted
                             pinned
                         />

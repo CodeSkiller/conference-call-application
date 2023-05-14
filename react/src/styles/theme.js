@@ -13,7 +13,7 @@ const getTheme = (primary, secondary, background, color70, textColor) => {
   const green50 = "#007269";
   const green60 = secondary ? secondary : "#00564F";
   const green70 = color70 ? color70 : "#003935";
-  const green80 = background ? background : "#001D1A";
+  const green80 = background ? background : "#000000";
   const green85 = "#024B46";
   const green90 = textColor ? textColor : "#6BCBC3";
   const chatText = "#DDFFFC";

@@ -103,13 +103,6 @@ function OptionButton({ footer, ...props }) {
                 horizontal: "left",
               }}
           >
-            <MenuItem onClick={() => handleLayoutDialogOpen()}>
-              <ListItemIcon>
-                <SvgIcon size={36} name={"layout"} color={"white"} />
-              </ListItemIcon>
-              <ListItemText>{t("Change Layout")}</ListItemText>
-            </MenuItem>
-
               {conference.isPlayOnly === false ?
             <MenuItem onClick={() => handleDialogOpen()}>
               <ListItemIcon>

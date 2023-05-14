@@ -38,10 +38,11 @@ i18n
   });
 
 const availableLangs = Object.keys(resources);
+console.log("Langs:", i18n.language, availableLangs)
 if (!availableLangs.includes(i18n.language)) {
 
   const maybeLang = i18n.language.slice(0, 2);
-  if (availableLangs.contains(maybeLang)) {
+  if (availableLangs.includes(maybeLang)) {
     localStorage.setItem("i18nextLng", maybeLang);
     i18n.changeLanguage(maybeLang);
   } else {
@@ -49,7 +50,6 @@ if (!availableLangs.includes(i18n.language)) {
     localStorage.setItem("i18nextLng", "en");
     i18n.changeLanguage("en");
   }
-
 }
 
 function getWindowLocation() {

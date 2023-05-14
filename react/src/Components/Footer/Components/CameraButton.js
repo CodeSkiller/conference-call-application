@@ -89,7 +89,7 @@ function MicButton(props) {
 
   return (
     <>
-      {cam && cam.isCameraOn ? (
+      { cam && cam.isCameraOn ? (
         <Tooltip title={conference.isScreenShared ? t('Camera is disabled while screensharing') : t('Turn off camera')} placement="top">
           <CustomizedBtn className={footer ? 'footer-icon-button' : ''} variant="contained" color="primary" sx={rounded ? roundStyle : {}} disabled={conference.isScreenShared} onClick={(e) => handleOff(e)}>
             <SvgIcon size={40} name={'camera'} color='inherit' />
