@@ -49,7 +49,7 @@ var mediaConstraints = {
 };
 
 if(allowCamera){
-  mediaConstraints.video={}
+  mediaConstraints["video"]={}
 }
 
 let websocketURL = process.env.REACT_APP_WEBSOCKET_URL;
@@ -154,6 +154,10 @@ function AntMedia() {
   const [webRTCAdaptor, setWebRTCAdaptor] = React.useState();
   const [initialized, setInitialized] = React.useState(false);
   const [recreateAdaptor, setRecreateAdaptor] = React.useState(true);
+
+  // CUSTOM CODEW :)
+  const [host, setHost] = React.useState(allowCamera?"localVideo":null);
+  const [otherParticipants, setOtherParticipants] = React.useState([])
 
 
   function makeFullScreen(divId) {
@@ -261,8 +265,6 @@ function AntMedia() {
   }
 
   useEffect(() => {
-    console.log("Recreating adaptor: ", websocketURL, recreateAdaptor, webRTCAdaptor, mediaConstraints)
-    console.log("ok.")
     if (recreateAdaptor && webRTCAdaptor == null) {
       setWebRTCAdaptor(new WebRTCAdaptor({
         websocket_url: websocketURL,
@@ -373,6 +375,7 @@ function AntMedia() {
       var tempList = [...obj.streams];
       tempList.push("!" + publishStreamId);
       handleRoomEvents(obj);
+
       if (!isPlaying && !reconnecting) {
         handlePlay(token, tempList);
         isPlaying = true;
@@ -505,14 +508,14 @@ function AntMedia() {
     }
     // if we already pin the targeted user then we are going to remove it from pinned video.
     if (pinnedVideoId === id) {
-      setPinnedVideoId(null);
+      //setPinnedVideoId(null);
       handleNotifyUnpinUser(id);
       webRTCAdaptor.assignVideoTrack(videoLabel, id, false);
     }
     // if there is no pinned video we are gonna pin the targeted user.
     // and we need to inform pinned user.
     else {
-      setPinnedVideoId(id);
+      //setPinnedVideoId(id);
       handleNotifyPinUser(id);
       webRTCAdaptor.assignVideoTrack(videoLabel, id, true);
     }
@@ -566,7 +569,7 @@ function AntMedia() {
     );
     //if I stop my screen share and if i have pin someone different from myself it just should not effect my pinned video.
     if (pinnedVideoId === "localVideo") {
-      setPinnedVideoId(null);
+      //setPinnedVideoId(null);
     }
   }
   function screenShareOnNotification() {
@@ -581,7 +584,7 @@ function AntMedia() {
       publishStreamId
     );
 
-    setPinnedVideoId("localVideo");
+    //setPinnedVideoId("localVideo");
   }
 
   function turnOffYourMicNotification(participantId) {
@@ -871,7 +874,7 @@ function AntMedia() {
         setScreenSharedVideoId(eventStreamId);
       } else if (eventType === "SCREEN_SHARED_OFF") {
         setScreenSharedVideoId(null);
-        setPinnedVideoId(null);
+        //setPinnedVideoId(null);
       } else if (eventType === "TURN_YOUR_MIC_OFF") {
         console.warn(notificationEvent.senderStreamId, "muted you");
         if(publishStreamId === notificationEvent.streamId) {
@@ -917,7 +920,6 @@ function AntMedia() {
           );
         }
       } else if (eventType === "VIDEO_TRACK_ASSIGNMENT_CHANGE") {
-        console.log(JSON.stringify(obj));
         if (!notificationEvent.payload.trackId) {
           return;
         }
@@ -943,6 +945,7 @@ function AntMedia() {
             });
         });
       } else if (eventType === "AUDIO_TRACK_ASSIGNMENT") {
+        console.log("AUDIO_TRACK_ASSIGNMENT", JSON.stringify(obj));
         clearInterval(timeoutRef.current);
         timeoutRef.current = setTimeout(() => {
           setTalkers([]);
@@ -1029,18 +1032,6 @@ function AntMedia() {
     webRTCAdaptor.play(obj.streamId, "", roomName);
   }
   function handlePublish(publishStreamId, token, subscriberId, subscriberCode) {
-    
-    console.log(
-      "Publishing:",
-      publishStreamId,
-      token,
-      subscriberId,
-      subscriberCode,
-      streamName,
-      roomName,
-      "{someKey:somveValue}"
-    )
-
     webRTCAdaptor.publish(
       publishStreamId,
       token,
@@ -1151,9 +1142,11 @@ function AntMedia() {
     }
   }
   function handleRoomEvents({ streams, streamList }) {
-    console.log("DBG: All participants:", allParticipants);
-    console.log("DBG: incoming Stream list", streamList)
-    console.log("DBG: incoming Streams", streams)
+    if(allowCamera){
+      setPinnedVideoId("localVideo");
+    }
+    
+    
     // [allParticipant, setAllParticipants] => list of every user
     setAllParticipants(streamList);
     // [participants,setParticipants] => number of visible participants due to tile count. If tile count is 3
@@ -1161,21 +1154,30 @@ function AntMedia() {
     // We are basically, finding names and match the names with the particular videos.
     // We do this because we can't get names from other functions.
     setParticipants((oldParts) => {
+
       if (streams.length < participants.length) {
-        return oldParts.filter((p) => streams.includes(p.id));
+       return oldParts.filter((p) => streams.includes(p.id))
       }
+
+
       // matching the names.
-      return oldParts.map((p) => {
+      let dldl = oldParts.map((p) => {
         const newName = streamList.find((s) => s.streamId === p.id)?.streamName;
+        if(newName && newName.includes("H0s999")){
+          setPinnedVideoId(p.id);
+          setHost(p.id);
+        }
         if (p.name !== newName) {
           return { ...p, name: newName };
         }
         return p;
       });
+
+      
+      return dldl;
     });
-    if (pinnedVideoId !== "localVideo" && !streams.includes(pinnedVideoId)) {
-      setPinnedVideoId(null);
-    }
+
+
   }
 
   function getSelectedDevices() {
@@ -1269,6 +1271,9 @@ function AntMedia() {
             devices,
             publishStreamId,
             allowCamera,
+            host,
+            otherParticipants,
+
             setSelectedBackgroundMode,
             setIsVideoEffectRunning,
             setParticipants,

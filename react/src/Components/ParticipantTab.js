@@ -33,25 +33,9 @@ function ParticipantTab(props) {
         sx={{ borderColor: "primary.main" }}
       >
         <Grid item sx={{ pr: 1 }}>
-          <ParticipantName variant="body1">{name}</ParticipantName>
+          <ParticipantName variant="body1">{name.replace("H0s999", "")}</ParticipantName>
         </Grid>
-        <Grid item>
-          {conference.pinnedVideoId === videoId ? (
-            <PinBtn
-              sx={{ minWidth: "unset", pt: 1, pb: 1 }}
-              onClick={() => conference.pinVideo(videoId)}
-            >
-              <SvgIcon size={28} name="unpin" color="#fff" />
-            </PinBtn>
-          ) : (
-            <PinBtn
-              sx={{ minWidth: "unset", pt: 1, pb: 1 }}
-              onClick={() => conference.pinVideo(videoId)}
-            >
-              <SvgIcon size={28} name="pin" color="#fff" />
-            </PinBtn>
-          )}
-        </Grid>
+
       </Grid>
     );
   };
