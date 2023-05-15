@@ -29,7 +29,7 @@ const AntDialogTitle = props => {
             top: 27,
           }}
         >
-          <SvgIcon size={30} name={'close'} color={'white'} />
+          <SvgIcon size={30} name={'close'} />
         </Button>
       ) : null}
     </DialogTitle>
@@ -73,9 +73,10 @@ export function SettingsDialog(props) {
 
   return (
     <Dialog onClose={handleClose} open={open} fullScreen={fullScreen} maxWidth={'sm'}>
-      <AntDialogTitle onClose={handleClose}>{t('Set Camera and Microphone')}</AntDialogTitle>
+      <AntDialogTitle onClose={handleClose}>Dispositivos</AntDialogTitle>
       <DialogContent>
-        <Box component="form" sx={{ display: 'flex', flexWrap: 'wrap' }}>
+        <Box component="form" sx={{ display: 'flex', flexWrap: 'wrap',  }}>
+        {conference.allowCamera &&
           <Grid container>
             <Grid container>
               <InputLabel>{t('Camera')}</InputLabel>
@@ -89,7 +90,6 @@ export function SettingsDialog(props) {
                   variant="outlined"
                   value={conference.selectedCamera}
                   onChange={e => switchVideoMode(e.target.value)}
-                  sx={{ color: 'white' }}
                 >
                   {conference.devices && conference.devices?.length > 0 && conference.devices
                     .filter(device => device.kind === 'videoinput')
@@ -102,18 +102,18 @@ export function SettingsDialog(props) {
               </Grid>
               <Hidden xsDown>
                 <Grid item>
-                  <SvgIcon size={30} name={'camera'} color={'white'} />
+                  <SvgIcon size={30} name={'camera'} />
                 </Grid>
               </Hidden>
             </Grid>
-          </Grid>
+          </Grid> }
           <Grid container sx={{ mt: 4 }}>
             <Grid container>
               <InputLabel>{t('Microphone')}</InputLabel>
             </Grid>
             <Grid container alignItems={'center'} spacing={2}>
               <Grid item xs={10}>
-                <Select autoFocus={selectFocus === 'audio'} variant="outlined" fullWidth value={conference.selectedMicrophone} onChange={e => switchAudioMode(e.target.value)} sx={{ color: 'white' }}>
+                <Select autoFocus={selectFocus === 'audio'} variant="outlined" fullWidth value={conference.selectedMicrophone} onChange={e => switchAudioMode(e.target.value)} >
                   {conference.devices && conference.devices?.length > 0 && conference.devices
                     .filter(device => device.kind === 'audioinput')
                     .map(device => (
@@ -125,18 +125,19 @@ export function SettingsDialog(props) {
               </Grid>
               <Hidden xsDown>
                 <Grid item>
-                  <SvgIcon size={36} name={'microphone'} color={'white'} />
+                  <SvgIcon size={36} name={'microphone'} />
                 </Grid>
               </Hidden>
             </Grid>
           </Grid>
+          {conference.allowCamera &&
           <Grid container sx={{ mt: 4 }}>
             <Grid container>
               <InputLabel>{t('Background')}</InputLabel>
             </Grid>
             <Grid container alignItems={'center'} spacing={2}>
               <Grid item xs={10}>
-                <Select variant="outlined" fullWidth value={conference.selectedBackgroundMode} onChange={e => setBackground(e.target.value)} sx={{ color: 'white' }}>
+                <Select variant="outlined" fullWidth value={conference.selectedBackgroundMode} onChange={e => setBackground(e.target.value)} >
                   <MenuItem key="none" value="none">
                     None
                   </MenuItem>
@@ -150,11 +151,11 @@ export function SettingsDialog(props) {
               </Grid>
               <Hidden xsDown>
                 <Grid item>
-                  <SvgIcon size={36} name={'background-replacement'} color={'white'} />
+                  <SvgIcon size={36} name={'background-replacement'} />
                 </Grid>
               </Hidden>
             </Grid>
-          </Grid>
+          </Grid>}
         </Box>
       </DialogContent>
     </Dialog>

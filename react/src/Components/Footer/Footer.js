@@ -14,9 +14,12 @@ import TimeZone from "./Components/TimeZone";
 import { useParams } from "react-router-dom";
 import { ConferenceContext } from 'pages/AntMedia';
 import ReconnectButton from './Components/ReconnectButton';
+import RecordButton from './Components/RecordButton';
+import RaiseHand from './Components/RaiseHand';
+import FullScreenButton from "./Components/FullScreenButton"
 
 const CustomizedGrid = styled(Grid)(({ theme }) => ({
-  backgroundColor: theme.palette.green[80],
+  backgroundColor: "transparent",
   position: "absolute",
   bottom: 0,
   left: 0,
@@ -35,10 +38,9 @@ function Footer(props) {
             justifyContent={{xs: "center", sm: "space-between"}}
         >
           <Grid item sx={{display: {xs: "none", sm: "block"}}}>
-            <Grid container alignItems={"center"}>
-
+            <Grid container  id="levitate-info" alignItems={"center"}>
               <InfoButton/> 
-              <Typography color="#ffffff" variant="body1">
+              <Typography variant="body1">
                 Sala: {id}
               </Typography>
             </Grid>
@@ -81,13 +83,26 @@ function Footer(props) {
                   <Grid item xs={0}>
                     <EndCallButton footer/>
                   </Grid>
-                  {process.env.NODE_ENV === "development"
+                  {false && process.env.NODE_ENV === "development"
                     ?
                     <Grid item xs={0}>
                       <ReconnectButton footer/>
                     </Grid>
                     : null
                   }
+                  {conference.allowCamera
+                    ?
+                    <Grid item xs={0}>
+                      <RecordButton footer/>
+                    </Grid>
+                    : 
+                    <Grid item xs={0}>
+                      <RaiseHand footer/>
+                    </Grid>
+                  }
+                  <Grid item xd={0}>
+                    <FullScreenButton footer/>
+                  </Grid>
                 </Grid>
               </Grid>
 

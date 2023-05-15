@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Grid } from "@mui/material";
+import { Grid, CircularProgress, Box } from "@mui/material";
 import { useParams } from "react-router-dom";
 import _ from "lodash";
 import WaitingRoom from "./WaitingRoom";
@@ -14,6 +14,8 @@ import { WebRTCAdaptor } from "@antmedia/webrtc_adaptor";
 import { getUrlParameter } from "@antmedia/webrtc_adaptor/dist/fetch.stream";
 import { SvgIcon } from "../Components/SvgIcon";
 import ParticipantListDrawer from "../Components/ParticipantListDrawer";
+import useFullscreenStatus from "Components/Cards/useFullScreen";
+
 
 export const ConferenceContext = React.createContext(null);
 
@@ -157,8 +159,8 @@ function AntMedia() {
 
   // CUSTOM CODEW :)
   const [host, setHost] = React.useState(allowCamera?"localVideo":null);
-  const [otherParticipants, setOtherParticipants] = React.useState([])
-
+  const fullScreenRef = React.useRef(null);
+  const [isFullScreen, setFullScreen] = useFullscreenStatus(fullScreenRef);
 
   function makeFullScreen(divId) {
     if (fullScreenId === divId) {
@@ -182,7 +184,7 @@ function AntMedia() {
     let isVideoDeviceAvailable = false;
     let isAudioDeviceAvailable = false;
     let selectedDevices = getSelectedDevices();
-    console.log("Selected devs:", selectedDevices)
+
     let currentCameraDeviceId = selectedDevices.videoDeviceId;
     let currentAudioDeviceId = selectedDevices.audioDeviceId;
 
@@ -197,7 +199,7 @@ function AntMedia() {
     }
 
     // if the selected devices are not available, select the first available device
-    if (allowCamera && selectedDevices.videoDeviceId === '' || isVideoDeviceAvailable === false) {
+    if (allowCamera && (selectedDevices.videoDeviceId === '' || isVideoDeviceAvailable === false)) {
       const camera = devices.find(d => d.kind === 'videoinput');
       if (camera) {
         selectedDevices.videoDeviceId = camera.deviceId;
@@ -599,7 +601,7 @@ function AntMedia() {
   }
 
   function displayPoorNetworkConnectionWarning() {
-    displayWarning("Your connection is not stable. Please check your internet connection!");
+    //displayWarning("Your connection is not stable. Please check your internet connection!");
   }
 
   function displayWarning(message) {
@@ -1235,8 +1237,36 @@ function AntMedia() {
     webRTCAdaptor.enableAudioLevelForLocalStream(listener, period);
   }
 
-  return (!initialized ? <>Hello. :)</> :
-    <Grid container className="App">
+  const handleExitFullScreen = () => {
+      document.exitFullscreen()
+.then(r=>{}).catch(e => {}).finally(on=>{})
+  }
+
+  const handleFS = () => {
+    if(isFullScreen){
+      handleExitFullScreen()
+    }else{
+      setFullScreen()
+    }
+  }
+
+  return (!initialized ? <> 
+    <Grid
+        container
+        spacing={0}
+        direction="column"
+        alignItems="center"
+        justifyContent="center"
+        style={{ minHeight: '100vh' }}
+      >
+        <Grid item xs={3}>
+        <Box sx={{ display: 'flex' }}>
+          <CircularProgress size="4rem" />
+        </Box>
+        </Grid>   
+      </Grid> 
+    </> :
+    <Grid container className="App" ref={fullScreenRef}>
       <Grid
         container
         className="App-header"
@@ -1272,7 +1302,7 @@ function AntMedia() {
             publishStreamId,
             allowCamera,
             host,
-            otherParticipants,
+            isFullScreen,
 
             setSelectedBackgroundMode,
             setIsVideoEffectRunning,
@@ -1307,7 +1337,8 @@ function AntMedia() {
             handleSetMaxVideoTrackCount,
             screenShareOffNotification,
             handleSendMessage,
-            turnOffYourMicNotification
+            turnOffYourMicNotification,
+            handleFS
           }}
         >
           <SnackbarProvider

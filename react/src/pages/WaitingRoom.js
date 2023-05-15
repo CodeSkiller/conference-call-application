@@ -139,7 +139,7 @@ function WaitingRoom() {
                   </Grid>
                 </Grid>
               </Grid>
-              <Typography align="center" color="#DDFFFC" sx={{mt: 2}}>
+              <Typography align="center" sx={{mt: 2}}>
               Puede elegir activar su {conference.allowCamera && "cámara y"} micrófono antes de entrar a la sala
               </Typography>
             </Grid>

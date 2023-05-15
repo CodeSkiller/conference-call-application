@@ -1,11 +1,11 @@
-import React, { memo, useCallback, useContext, useEffect, useRef } from "react";
+import React, { memo, useCallback, useContext, useEffect } from "react";
 import { alpha, styled } from "@mui/material/styles";
 import { ConferenceContext } from "pages/AntMedia";
 import DummyCard from "./DummyCard";
-import { Grid, Typography, useTheme, Box, Tooltip, Fab } from "@mui/material";
+import { Grid, Typography, useTheme, Box, Tooltip } from "@mui/material";
 import { SvgIcon } from "../SvgIcon";
 import { useTranslation } from "react-i18next";
-import useFullscreenStatus from "./useFullScreen";
+import NoTransmission from "./NoTransmission";
 
 const CustomizedVideo = styled("video")({
   borderRadius: 4,
@@ -22,7 +22,6 @@ const VideoCard = memo(({ srcObject, hidePin, onHandlePin, ...props }) => {
   const conference = useContext(ConferenceContext);
 
   const { t } = useTranslation();
-  const [displayHover, setDisplayHover] = React.useState(false);
   const theme = useTheme();
 
   const cardBtnStyle = {
@@ -43,53 +42,6 @@ const VideoCard = memo(({ srcObject, hidePin, onHandlePin, ...props }) => {
     },
     [props.track]
   );
-  
-
-
-  const videoElem = useRef(null);
-
-  let isFullScreen, setIsFullScreen;
-  let errorMsg;
-
-  
-  try {
-    [isFullScreen, setIsFullScreen] = useFullscreenStatus(videoElem);
-  } catch (e) {
-    errorMsg = 'Fullscreen not supported';
-    isFullScreen = false;
-    setIsFullScreen = undefined;
-  }
-
-
-  const handleExitFullScreen = () => {
-      isFullScreen = false;
-      document.exitFullscreen()
-      .then(r=>{
-      }).catch(e => {
-      }).finally(on=>{
-        isFullScreen = false;
-      })
-  }
-
-  const handleFS = () => {
-    if(isFullScreen){
-      console.log("DBG: RUNNING EXIT")
-      handleExitFullScreen()
-    }else{
-      console.log("DBG: RUNNING FS")
-      setIsFullScreen()
-    }
-
-  }
-
-  const handleClick = (e) => {
-    // This is handling double click :) 
-    switch (e.detail) {
-      case 2:
-        handleFS();
-        break;
-    }
-  };
 
   React.useEffect(() => {
     if (props.track?.kind === "video" && !props.track.onended) {
@@ -173,8 +125,6 @@ const VideoCard = memo(({ srcObject, hidePin, onHandlePin, ...props }) => {
           width: "100%",
           position: "relative",
         }}
-        onMouseEnter={() => setDisplayHover(true)}
-        onMouseLeave={(e) => setDisplayHover(false)}
       >
 
 
@@ -193,7 +143,8 @@ const VideoCard = memo(({ srcObject, hidePin, onHandlePin, ...props }) => {
             style={{ height: "100%" }}
             container
           >
-            <DummyCard />
+            {props.noTransmission ? <NoTransmission /> : <DummyCard />}
+            
           </Grid>
 
           <Grid
@@ -203,11 +154,9 @@ const VideoCard = memo(({ srcObject, hidePin, onHandlePin, ...props }) => {
               height: "100%",
               transform: mirrorView ? "rotateY(180deg)" : "none",
             }}
-            ref={videoElem}
           >
             <CustomizedVideo
               {...props}
-              onClick={handleClick}
               ref={refVideo}
               playsInline
             ></CustomizedVideo>
@@ -250,15 +199,6 @@ const VideoCard = memo(({ srcObject, hidePin, onHandlePin, ...props }) => {
               </Box>
             </Grid>
              */}
-            {props.pinned && (
-              <Tooltip title={t("Entrar en modo pantalla completa")} placement="top" onClick={handleFS}>
-                <Grid item>
-                  <CustomizedBox sx={cardBtnStyle}>
-                    <SvgIcon size={70} name={"full-screen"} color="#fff" />
-                  </CustomizedBox> 
-                </Grid>
-              </Tooltip>
-            )}
           </Grid>
           {props.name && (
             <div className="name-indicator">
@@ -283,14 +223,12 @@ const VideoCard = memo(({ srcObject, hidePin, onHandlePin, ...props }) => {
     </>
   ) : (
     <>
-    <div ref={videoElem}>
       <video
         style={{ display: "none" }}
         {...props}
         ref={refVideo}
         playsInline
       ></video>
-    </div>
     </>
   );
 });

@@ -6,7 +6,7 @@ function DummyCard() {
     <Grid
       container
       style={{
-        background: "var(--green-70)",
+        background: "#cc4392",
         borderRadius: 4,
         height: "100%",
       }}

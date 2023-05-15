@@ -70,24 +70,6 @@ window.getWindowLocation = getWindowLocation;
 window.copyWindowLocation = copyWindowLocation;
 
 function App() {
-  const handleFullScreen = (e) => {
-    if (e.target?.id === "meeting-gallery") {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen();
-      } else {
-        document.exitFullscreen();
-      }
-    }
-  };
-
-  React.useEffect(() => {
-    window.addEventListener("dblclick", handleFullScreen);
-
-    // cleanup this component
-    return () => {
-      window.removeEventListener("dblclick", handleFullScreen);
-    };
-  }, []);
   // "#d2c8f1", "#323135", "#000", "#1b1b1b", "white"
   return (
     <ThemeProvider theme={theme()}>

@@ -81,7 +81,7 @@ function OptionButton({ footer, ...props }) {
                 aria-controls={open ? "demo-positioned-menu" : undefined}
                 aria-haspopup="true"
                 aria-expanded={open ? "true" : undefined}
-                onClick={handleClick}
+                onClick={handleDialogOpen}
             >
               <SvgIcon size={40} name={'settings'} color={open ? 'black' : 'white'} />
             </CustomizedBtn>
@@ -112,9 +112,10 @@ function OptionButton({ footer, ...props }) {
             </MenuItem>
                     : null}
 
+                  
             <MenuItem
                 component={"a"}
-                href="https://github.com/ant-media/conference-call-application/issues"
+                href="https://campus.veropo.com/"
                 target={"_blank"}
                 rel="noopener noreferrer"
             >

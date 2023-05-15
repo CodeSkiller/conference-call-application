@@ -13,6 +13,7 @@
 html,
 body {
   color: "#FFF";
+  overflow: hidden;
 }
 /* colors */
 .App {
@@ -202,7 +203,7 @@ form {
 }
 
 .others-tile-inner {
-  background: var(--green-70);
+  background: "#cc4392";
   height: 100%;
   width: 100%;
   display: flex;
@@ -246,4 +247,9 @@ form {
   .single-video-container.pinned {
     height: auto;
   }
+}
+
+
+#levitate-info {
+  position: fixed;
 }

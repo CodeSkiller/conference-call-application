@@ -5,18 +5,18 @@ import OpenSansSemiBold from "../static/Fonts/OpenSans/OpenSans-SemiBold.ttf";
 import OpenSansBold from "../static/Fonts/OpenSans/OpenSans-Bold.ttf";
 
 const getTheme = (primary, secondary, background, color70, textColor) => {
-  const green0 = textColor ? textColor : "#AFF3EE";
-  const green10 = primary ? primary : "#00E5D2";
+  const green0 = textColor ? textColor : "#000001";
+  const green10 = primary ? primary : "#62a8ea";
   const green20 = "#00C8B8";
   const green30 = "#00AC9E";
   const green40 = "#008F83";
   const green50 = "#007269";
-  const green60 = secondary ? secondary : "#00564F";
-  const green70 = color70 ? color70 : "#003935";
-  const green80 = background ? background : "#000000";
+  const green60 = secondary ? secondary : "#9ccfff";
+  const green70 = color70 ? color70 : "#174066";
+  const green80 = background ? background : "#fefefe";
   const green85 = "#024B46";
-  const green90 = textColor ? textColor : "#6BCBC3";
-  const chatText = "#DDFFFC";
+  const green90 = textColor ? textColor : "#000000";
+  const chatText = "#000000";
   const darkGray = "#222B2A";
 
   const error = "#DF0515";
@@ -25,7 +25,7 @@ const getTheme = (primary, secondary, background, color70, textColor) => {
   const Theme = createTheme({
     typography: {
       allVariants: {
-        color: textColor ? textColor : "#FFFFFF",
+        color: textColor ? textColor : "#000000",
         fontFamily: "'OpenSans'",
       },
       h1: {
@@ -70,11 +70,11 @@ const getTheme = (primary, secondary, background, color70, textColor) => {
         styleOverrides: {
           root: {
             "& fieldset": {
-              borderColor: "white",
+              borderColor: "black",
             },
           },
           icon: {
-            color: "white",
+            color: "black",
           },
         },
       },
@@ -110,7 +110,7 @@ const getTheme = (primary, secondary, background, color70, textColor) => {
       MuiDialogTitle: {
         styleOverrides: {
           root: {
-            color: "white",
+            color: "black",
             padding: "24px 0",
             fontSize: 24,
           },
@@ -120,7 +120,7 @@ const getTheme = (primary, secondary, background, color70, textColor) => {
         styleOverrides: {
           root: {
             borderRadius: 6,
-            background: "#022824",
+            background: "#white",
           },
         },
       },
@@ -129,7 +129,7 @@ const getTheme = (primary, secondary, background, color70, textColor) => {
           root: {
             paddingTop: 16,
             paddingBottom: 16,
-            color: "white",
+            color: "black",
           },
         },
       },
@@ -143,7 +143,7 @@ const getTheme = (primary, secondary, background, color70, textColor) => {
       MuiListItemText: {
         styleOverrides: {
           primary: {
-            color: "white",
+            color: "black",
           },
         },
       },
@@ -180,7 +180,7 @@ const getTheme = (primary, secondary, background, color70, textColor) => {
             padding: "11.5px 20px",
             "&::placeholder": {
               fontSize: 16,
-              color: secondaryColor,
+              color: "white",
               opacity: 1,
             },
           },
@@ -202,7 +202,7 @@ const getTheme = (primary, secondary, background, color70, textColor) => {
         styleOverrides: {
           outlinedSecondary: {
             border: `1px solid ${green60}`,
-            color: "white",
+            color: "black",
           },
 
           root: {
@@ -342,8 +342,8 @@ const getTheme = (primary, secondary, background, color70, textColor) => {
         90: darkGray,
       },
       text: {
-        primary: "#FFFFFF",
-        default: "#FFFFFF",
+        primary: "#000000",
+        default: "#000000",
         secondary: chatText, // dark4
       },
     },
