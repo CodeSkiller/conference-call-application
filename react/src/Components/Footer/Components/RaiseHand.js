@@ -20,24 +20,23 @@ const CustomizedBtn = styled(Button)(({ theme }) => ({
   }
 }));
 
-function RecordButton({ footer, ...props }) {
+function RaiseHand({ footer, ...props }) {
     const conference = React.useContext(ConferenceContext);
     const {t} = useTranslation();
-
     return (
             <CustomTooltip title={t('Levantar la mano')} placement="top">
                 <CustomizedBtn
                     onClick={() => {
-                        props.handleFS();
+                        conference.handleRaiseHand()
                     }}
                     variant="contained"
                     className={footer ? 'footer-icon-button' : ''}
-                    color='secondary'
+                    color={conference.raisedHand ? 'primary' : 'secondary'}
                 >
-                    <SvgIcon size={36} color="secondary" name={'hand'} />
+                    <SvgIcon size={36} color={conference.raisedHand ? 'primary' : 'white'} name={'hand'} />
                 </CustomizedBtn>
             </CustomTooltip>
         );
 }
 
-export default RecordButton;
+export default RaiseHand;

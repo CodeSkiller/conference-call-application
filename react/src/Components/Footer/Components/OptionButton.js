@@ -35,9 +35,6 @@ function OptionButton({ footer, ...props }) {
   // if you select camera then we are going to focus on camera button.
   const [selectFocus, setSelectFocus] = React.useState(null);
 
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
   const handleClose = () => {
     setAnchorEl(null);
   };
@@ -50,11 +47,7 @@ function OptionButton({ footer, ...props }) {
   const handleDialogClose = (value) => {
     setDialogOpen(false);
   };
-  const handleLayoutDialogOpen = (focus) => {
-    setSelectFocus(focus);
-    setLayoutDialogOpen(true);
-    handleClose();
-  };
+
 
   const handleLayoutDialogClose = (value) => {
     setLayoutDialogOpen(false);

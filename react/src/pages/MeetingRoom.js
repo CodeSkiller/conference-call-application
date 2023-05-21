@@ -238,7 +238,7 @@ const MeetingRoom = React.memo((props) => {
   const returnListGallery = () => {
     const r = <div className="unpinned">
       {conference.allParticipants.filter(p=>!p.streamId.includes("H0s999") && conference.talkers.includes(p.streamId)).map((e, index)=>{
-        return <div className="">
+        return <div className="" key={"lg"+index}>
 
               <Tooltip title={"Hablando.."} placement="top">
                 <Grid item>
@@ -261,6 +261,31 @@ const MeetingRoom = React.memo((props) => {
   </div>
     return r 
   }
+  
+  const returnHandsRaised = () => {
+    const r = <div className="">
+      {conference.handsUp.map((e, index)=>{
+        return <div className="" key={"hr"+index}>
+              <Tooltip title={e+", ha levantado la mano."} placement="top" onClick={()=>conference.handleDownHand(e)}>
+                <Grid item>
+                  <CustomizedBox sx={cardBtnStyle} variant="contained">
+                  <Grid container direction="row" alignItems="center">
+                    <Grid item>
+                      <SvgIcon size={"42px"} name={"hand"} color="#fff" />
+                    </Grid>
+                    <Grid item>
+                      <span style={{"color": "#fff"}}>{e}</span>
+                    </Grid>
+                  </Grid>
+                  </CustomizedBox>
+                </Grid>
+              </Tooltip>
+        </div>
+    })}
+  </div>
+    return r 
+  }
+
   const returnUnpinnedGallery = () => {
     //pinned tile
     let unpinnedParticipants = getUnpinnedParticipants();
@@ -407,9 +432,9 @@ const MeetingRoom = React.memo((props) => {
                       )
                     )}
                     <div id="somewhere-else" style={{"display": "none"}}>{returnUnpinnedGallery()}</div>
-                    <div style={{"position": "fixed", "top":"15px", "left":"15px"}}>{returnListGallery()}
+                    <div style={{"position": "fixed", "top":"15px", "left":"15px"}}>{returnListGallery()}</div>
+                    <div style={{"position": "fixed", "top":"15px", "right":"15px"}}>{returnHandsRaised()}</div>
 
-                    </div>
                   </>
               )}
             </div>

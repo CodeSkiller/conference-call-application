@@ -1,5 +1,6 @@
 import React from "react";
 import { Grid } from "@mui/material";
+
 function NoTransmission() {
   return (
     <Grid
@@ -16,7 +17,7 @@ function NoTransmission() {
         borderRadius: "4%",
         padding: "40px",
       }}>
-        <img src="https://campus.veropo.com/pluginfile.php/1/theme_remui/logo/1684153043/Logo_Veropo.png" width={"240px"} />
+        <img src="https://campus.veropo.com/pluginfile.php/1/theme_remui/logo/1684153043/Logo_Veropo.png" width={"240px"} alt="No transmission yet."/>
       </Grid>
     </Grid>
   );

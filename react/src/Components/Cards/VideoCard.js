@@ -2,7 +2,7 @@ import React, { memo, useCallback, useContext, useEffect } from "react";
 import { alpha, styled } from "@mui/material/styles";
 import { ConferenceContext } from "pages/AntMedia";
 import DummyCard from "./DummyCard";
-import { Grid, Typography, useTheme, Box, Tooltip } from "@mui/material";
+import { Grid, Typography, Box, Tooltip } from "@mui/material";
 import { SvgIcon } from "../SvgIcon";
 import { useTranslation } from "react-i18next";
 import NoTransmission from "./NoTransmission";
@@ -22,7 +22,6 @@ const VideoCard = memo(({ srcObject, hidePin, onHandlePin, ...props }) => {
   const conference = useContext(ConferenceContext);
 
   const { t } = useTranslation();
-  const theme = useTheme();
 
   const cardBtnStyle = {
     display: "flex",
@@ -92,9 +91,6 @@ const VideoCard = memo(({ srcObject, hidePin, onHandlePin, ...props }) => {
 
   const isLocal = props?.id === "localVideo";
   const mirrorView = isLocal && !conference?.isScreenShared;
-  const isScreenSharing =
-    conference?.isScreenShared ||
-    conference?.screenSharedVideoId === props?.id;
   //conference?.isScreenShared means am i sharing my screen
   //conference?.screenSharedVideoId === props?.id means is someone else sharing their screen
   useEffect(() => {
@@ -152,7 +148,7 @@ const VideoCard = memo(({ srcObject, hidePin, onHandlePin, ...props }) => {
             sx={isOff ? { display: "none" } : {}}
             style={{
               height: "100%",
-              transform: mirrorView ? "rotateY(180deg)" : "none",
+              transform: mirrorView ? "none" : "none",
             }}
           >
             <CustomizedVideo

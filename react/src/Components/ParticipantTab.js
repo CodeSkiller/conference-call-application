@@ -2,7 +2,6 @@ import React from "react";
 import Stack from "@mui/material/Stack";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
 import { styled } from "@mui/material/styles";
 import { SvgIcon } from "./SvgIcon";
 import { ConferenceContext } from "pages/AntMedia";
@@ -13,11 +12,6 @@ const ParticipantName = styled(Typography)(({ theme }) => ({
   fontSize: 14,
 }));
 
-const PinBtn = styled(Button)(({ theme }) => ({
-  "&:hover": {
-    backgroundColor: theme.palette.green[50],
-  },
-}));
 
 function ParticipantTab(props) {
   const conference = React.useContext(ConferenceContext);

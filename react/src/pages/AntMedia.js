@@ -15,6 +15,7 @@ import { getUrlParameter } from "@antmedia/webrtc_adaptor/dist/fetch.stream";
 import { SvgIcon } from "../Components/SvgIcon";
 import ParticipantListDrawer from "../Components/ParticipantListDrawer";
 import useFullscreenStatus from "Components/Cards/useFullScreen";
+import N1 from "../static/audio/N1.mp3"
 
 
 export const ConferenceContext = React.createContext(null);
@@ -137,6 +138,8 @@ function AntMedia() {
   const [selectedBackgroundMode, setSelectedBackgroundMode] = React.useState("");
   const [isVideoEffectRunning, setIsVideoEffectRunning] = React.useState(false);
   const [virtualBackground, setVirtualBackground] = React.useState(null);
+  const [handsUp, setHandsUp] = React.useState([]);
+  const [raisedHand, setRaisedHand] = React.useState(false);
   const timeoutRef = React.useRef(null);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
@@ -543,6 +546,22 @@ function AntMedia() {
     });
   }
 
+  function handleRaiseHand() {
+    setRaisedHand(!raisedHand)
+    handleSendNotificationEvent("RAISE_HAND", publishStreamId, {
+      streamId: streamName,
+      raised: !raisedHand
+    });
+  }
+
+  function handleDownHand(name) {
+    setHandsUp((handsUp.filter(e=>e!==name)))
+    handleSendNotificationEvent("RAISE_HAND", publishStreamId, {
+      streamId: name,
+      raised: false
+    });
+  }
+
   function handleSetMaxVideoTrackCount(maxTrackCount) {
     if (publishStreamId) {
       webRTCAdaptor.setMaxVideoTrackCount(publishStreamId, maxTrackCount);
@@ -920,6 +939,18 @@ function AntMedia() {
             publishStreamId,
             requestedMediaConstraints
           );
+        }
+      } else if (eventType === "RAISE_HAND") {
+        if(notificationEvent.raised){
+          setHandsUp([...handsUp, eventStreamId])
+          let audio = new Audio(N1);
+          audio.volume = 0.25;
+          audio.play();
+        }else{
+          if(eventStreamId===streamName){
+            setRaisedHand(false)
+          }
+          setHandsUp(handsUp.filter((e)=> e !== eventStreamId))
         }
       } else if (eventType === "VIDEO_TRACK_ASSIGNMENT_CHANGE") {
         if (!notificationEvent.payload.trackId) {
@@ -1303,6 +1334,8 @@ function AntMedia() {
             allowCamera,
             host,
             isFullScreen,
+            raisedHand,
+            handsUp,
 
             setSelectedBackgroundMode,
             setIsVideoEffectRunning,
@@ -1333,12 +1366,15 @@ function AntMedia() {
             setWaitingOrMeetingRoom,
             handleLeaveFromRoom,
             handleSendNotificationEvent,
+            handleRaiseHand,
+            handleDownHand,
             reconnect,
             handleSetMaxVideoTrackCount,
             screenShareOffNotification,
             handleSendMessage,
             turnOffYourMicNotification,
-            handleFS
+            handleFS,
+            setRaisedHand,
           }}
         >
           <SnackbarProvider
