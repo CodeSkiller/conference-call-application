@@ -555,6 +555,8 @@ function AntMedia() {
   }
 
   function handleDownHand(name) {
+    if(!allowCamera)
+      return;
     setHandsUp((handsUp.filter(e=>e!==name)))
     handleSendNotificationEvent("RAISE_HAND", publishStreamId, {
       streamId: name,
@@ -609,6 +611,9 @@ function AntMedia() {
   }
 
   function turnOffYourMicNotification(participantId) {
+    if(!allowCamera)
+      return;
+
     handleSendNotificationEvent(
       "TURN_YOUR_MIC_OFF",
       publishStreamId,
@@ -793,6 +798,11 @@ function AntMedia() {
   }
 
   function toggleSetMic(data) {
+
+    if(raisedHand){
+      handleRaiseHand()
+    }
+    
     setMic((micList) => {
       let arr = _.cloneDeep(micList);
       let micObj = arr.find((c) => c.eventStreamId === data.eventStreamId);
@@ -897,7 +907,7 @@ function AntMedia() {
         setScreenSharedVideoId(null);
         //setPinnedVideoId(null);
       } else if (eventType === "TURN_YOUR_MIC_OFF") {
-        console.warn(notificationEvent.senderStreamId, "muted you");
+        displayWarning("El profesor ha apagado tu microfono.");
         if(publishStreamId === notificationEvent.streamId) {
           toggleSetMic({
             eventStreamId: 'localVideo',

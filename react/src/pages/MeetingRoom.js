@@ -239,8 +239,13 @@ const MeetingRoom = React.memo((props) => {
     const r = <div className="unpinned">
       {conference.allParticipants.filter(p=>!p.streamId.includes("H0s999") && conference.talkers.includes(p.streamId)).map((e, index)=>{
         return <div className="" key={"lg"+index}>
-
-              <Tooltip title={"Hablando.."} placement="top">
+              <Tooltip 
+                title={
+                  "Hablando.."+(conference.allowCamera ? "Si hace click, lo silenciara": "")
+                } 
+                placement="top" 
+                onClick={()=>conference.turnOffYourMicNotification(e.streamId)}
+              >
                 <Grid item>
                   <CustomizedBox sx={cardBtnStyle} variant="contained">
                   <Grid container direction="row" alignItems="center">
@@ -254,8 +259,6 @@ const MeetingRoom = React.memo((props) => {
                   </CustomizedBox>
                 </Grid>
               </Tooltip>
-
-
         </div>
     })}
   </div>
