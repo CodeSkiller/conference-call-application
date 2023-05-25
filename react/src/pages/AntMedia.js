@@ -164,6 +164,7 @@ function AntMedia() {
   const [host, setHost] = React.useState(allowCamera?"localVideo":null);
   const fullScreenRef = React.useRef(null);
   const [isFullScreen, setFullScreen] = useFullscreenStatus(fullScreenRef);
+  const [closeScreenShare, setCloseScreenShare] = React.useState(false);
 
   function makeFullScreen(divId) {
     if (fullScreenId === divId) {
@@ -647,22 +648,27 @@ function AntMedia() {
   }
 
   function handleScreenshareNotFromPlatform() {
-    setIsScreenShared(false);
-    if (
-      cam.find(
-        (c) => c.eventStreamId === "localVideo" && c.isCameraOn === false
-      )
-    ) {
-      webRTCAdaptor.turnOffLocalCamera(publishStreamId);
+    if (typeof webRTCAdaptor !== "undefined") {
+      setIsScreenShared(false);
+      if (
+        cam.find(
+          (c) => c.eventStreamId === "localVideo" && c.isCameraOn === false
+        )
+      ) {
+        webRTCAdaptor.turnOffLocalCamera(publishStreamId);
+      } else {
+        webRTCAdaptor.switchVideoCameraCapture(publishStreamId);
+      }
+      screenShareOffNotification();
+      let requestedMediaConstraints = {
+        width: 320,
+        height: 240,
+      };
+      webRTCAdaptor.applyConstraints(publishStreamId, requestedMediaConstraints);
+      setCloseScreenShare(false);
     } else {
-      webRTCAdaptor.switchVideoCameraCapture(publishStreamId);
+      setCloseScreenShare(true);
     }
-    screenShareOffNotification();
-    let requestedMediaConstraints = {
-      width: 320,
-      height: 240,
-    };
-    webRTCAdaptor.applyConstraints(publishStreamId, requestedMediaConstraints);
   }
   function handleStopScreenShare() {
     setIsScreenShared(false);
@@ -707,6 +713,12 @@ function AntMedia() {
     scrollToBottom();
   }, [messages]);
 
+  useEffect(() => {
+    if (closeScreenShare) {
+      handleScreenshareNotFromPlatform();
+    }
+  }, [closeScreenShare]);
+
   function scrollToBottom() {
     let objDiv = document.getElementById("paper-props");
     if (objDiv  && scroll_down && objDiv.scrollHeight > objDiv.clientHeight) {
@@ -714,7 +726,7 @@ function AntMedia() {
       scrollThreshold = 0.95;
       scroll_down = false;
     }
-    
+
   }
   function handleMessageDrawerOpen(open) {
     closeSnackbar();
