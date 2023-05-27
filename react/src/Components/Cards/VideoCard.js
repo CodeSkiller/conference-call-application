@@ -18,7 +18,7 @@ const CustomizedBox = styled(Box)(({ theme }) => ({
   backgroundColor: alpha(theme.palette.gray[90], 0.4),
 }));
 
-const VideoCard = memo(({ srcObject, hidePin, onHandlePin, ...props }) => {
+const VideoCard = memo(({ srcObject, hidePin, onHandlePin, noTransmission, ...props }) => {
   const conference = useContext(ConferenceContext);
 
   const { t } = useTranslation();
@@ -43,11 +43,11 @@ const VideoCard = memo(({ srcObject, hidePin, onHandlePin, ...props }) => {
   );
 
   React.useEffect(() => {
+    
     if (props.track?.kind === "video" && !props.track.onended) {
       props.track.onended = (event) => {
         conference?.globals?.trackEvents.push({track:props.track.id,event:"removed"});
         if (conference.participants.length > conference?.globals?.maxVideoTrackCount) {
-          console.log("video before:"+JSON.stringify(conference.participants));
           conference.setParticipants((oldParts) => {
             return oldParts.filter(
               (p) => !(p.id === props.id || p.videoLabel === props.id)
@@ -139,7 +139,7 @@ const VideoCard = memo(({ srcObject, hidePin, onHandlePin, ...props }) => {
             style={{ height: "100%" }}
             container
           >
-            {props.noTransmission ? <NoTransmission /> : <DummyCard />}
+            {noTransmission ? <NoTransmission /> : <DummyCard />}
             
           </Grid>
 

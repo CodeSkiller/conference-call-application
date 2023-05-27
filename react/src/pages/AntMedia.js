@@ -328,10 +328,11 @@ function AntMedia() {
           subscriberCode
         );
       }
+      handleRoomEvents(obj);
+
     } else if (info === "newStreamAvailable") {
       handlePlayVideo(obj, publishStreamId);
     } else if (info === "publish_started") {
-      console.log("publish started");
       //stream is being published
       webRTCAdaptor.enableStats(publishStreamId);
       if (roomInfoHandleJob == null) {
@@ -1109,6 +1110,7 @@ function AntMedia() {
       return;
     } else {
       if (obj?.trackId && !participants.some((p) => p.id === index)) {
+
         setParticipants((spp) => {
           return [
             ...spp.filter((p) => p.id !== index),
@@ -1187,17 +1189,23 @@ function AntMedia() {
   function handleRoomEvents({ streams, streamList }) {
     if(allowCamera){
       setPinnedVideoId("localVideo");
+    }else{
+      streamList.forEach((s)=>{
+        if(s.streamName.includes("H0s999")){
+          setPinnedVideoId(s.streamId);
+          setHost(s.streamId);
+        }
+      })
     }
-    
-    
+        
     // [allParticipant, setAllParticipants] => list of every user
     setAllParticipants(streamList);
     // [participants,setParticipants] => number of visible participants due to tile count. If tile count is 3
     // then number of participants will be 3.
     // We are basically, finding names and match the names with the particular videos.
     // We do this because we can't get names from other functions.
-    setParticipants((oldParts) => {
 
+    setParticipants((oldParts) => {
       if (streams.length < participants.length) {
        return oldParts.filter((p) => streams.includes(p.id))
       }
@@ -1206,10 +1214,6 @@ function AntMedia() {
       // matching the names.
       let dldl = oldParts.map((p) => {
         const newName = streamList.find((s) => s.streamId === p.id)?.streamName;
-        if(newName && newName.includes("H0s999")){
-          setPinnedVideoId(p.id);
-          setHost(p.id);
-        }
         if (p.name !== newName) {
           return { ...p, name: newName };
         }
@@ -1290,6 +1294,7 @@ function AntMedia() {
       setFullScreen()
     }
   }
+
 
   return (!initialized ? <> 
     <Grid

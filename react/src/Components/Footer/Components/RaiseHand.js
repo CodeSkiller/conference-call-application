@@ -33,7 +33,7 @@ function RaiseHand({ footer, ...props }) {
                     className={footer ? 'footer-icon-button' : ''}
                     color={conference.raisedHand ? 'primary' : 'secondary'}
                 >
-                    <SvgIcon size={36} color={conference.raisedHand ? 'primary' : 'white'} name={'hand'} />
+                    <SvgIcon size={36} color={conference.raisedHand ? 'red' : 'white'} name={'hand'} />
                 </CustomizedBtn>
             </CustomTooltip>
         );
