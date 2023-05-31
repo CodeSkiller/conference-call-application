@@ -331,8 +331,8 @@ const MeetingRoom = React.memo((props) => {
               );
             } else if (conference.isPlayOnly === false) {
               return (
-                  <div className="unpinned">
-                    <div className="single-video-container pinned keep-ratio" key={index}>
+                  <div className="unpinned" key={index}>
+                    <div className="single-video-container pinned keep-ratio">
                       <VideoCard
                           onHandlePin={() => {
                             conference.pinVideo("localVideo", "localVideo");

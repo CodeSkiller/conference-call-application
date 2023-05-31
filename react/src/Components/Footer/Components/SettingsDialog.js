@@ -59,12 +59,23 @@ export function SettingsDialog(props) {
     conference.setSelectedBackgroundMode(value);
     conference.handleBackgroundReplacement(value);
   }
+  
 
   React.useEffect(() => {
     if (conference.devices) {
-      const camera = conference.devices.find(d => d.kind === 'videoinput');
-      const audio = conference.devices.find(d => d.kind === 'audioinput');
+
+      let camera = conference.allowCamera && conference.devices.find(d => d.kind === 'videoinput');
+
+      if(conference.allowCamera ){
+        for(let i=0; i<conference.devices.length; i++){
+          if(conference.devices[i].label.includes("OBS") || conference.devices[i].label.includes("VirtualCam")){
+            camera = conference.devices[i];
+          }
+        }
+      }
       if (camera && conference.selectedCamera === '') conference.cameraSelected(camera.deviceId);
+      
+      const audio = conference.devices.find(d => d.kind === 'audioinput');
       if (audio && conference.selectedMicrophone === '') conference.microphoneSelected(audio.deviceId);
       if (conference.selectedBackgroundMode === '') conference.setSelectedBackgroundMode('none');
     }

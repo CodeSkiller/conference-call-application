@@ -204,11 +204,24 @@ function AntMedia() {
 
     // if the selected devices are not available, select the first available device
     if (allowCamera && (selectedDevices.videoDeviceId === '' || isVideoDeviceAvailable === false)) {
-      const camera = devices.find(d => d.kind === 'videoinput');
-      if (camera) {
-        selectedDevices.videoDeviceId = camera.deviceId;
+
+      let selected = false;
+      for(let i=0; i<devices.length; i++){
+        if(devices[i].label.includes("OBS") || devices[i].label.includes("VirtualCam")){
+          selected = true;
+          selectedDevices.videoDeviceId = devices[i].deviceId;
+        }
       }
+
+      if(!selected){
+        const camera = devices.find(d => d.kind === 'videoinput');
+        if (camera) {
+          selectedDevices.videoDeviceId = camera.deviceId;
+        }
+      }
+
     }
+    
     if (selectedDevices.audioDeviceId === '' || isAudioDeviceAvailable === false) {
       const audio = devices.find(d => d.kind === 'audioinput');
       if (audio) {
@@ -1202,12 +1215,13 @@ function AntMedia() {
     if(allowCamera){
       setPinnedVideoId("localVideo");
     }else{
-      streamList.forEach((s)=>{
-        if(s.streamName.includes("H0s999")){
-          setPinnedVideoId(s.streamId);
-          setHost(s.streamId);
-        }
-      })
+      const found = streamList.find((s) => s.streamName.includes("H0s999"));
+      if(found){
+        setPinnedVideoId(found.streamId);
+        setHost(found.streamId);
+      }else{
+        setHost(false);
+      }
     }
         
     // [allParticipant, setAllParticipants] => list of every user

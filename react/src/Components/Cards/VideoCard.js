@@ -199,7 +199,7 @@ const VideoCard = memo(({ srcObject, hidePin, onHandlePin, noTransmission, ...pr
           {props.name && (
             <div className="name-indicator">
               <Typography color="white" align="left" className="name">
-                {props.name}{" "}
+                {props.name.split("QZh01")[0]}{" "}
                 {process.env.NODE_ENV === "development"
                   ? `${
                       isLocal

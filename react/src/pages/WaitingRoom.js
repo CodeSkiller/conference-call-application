@@ -149,7 +149,7 @@ function WaitingRoom() {
               <Grid container justifyContent={"center"}>
                 <Grid container justifyContent={"center"}>
                   <Typography variant="h5" align="center">
-                    Hola, {conference.streamName.replace("H0s999", "")}
+                    Hola, {conference.streamName.split("QZh01")[0]}
                   </Typography>
                 </Grid>
                 <Grid
