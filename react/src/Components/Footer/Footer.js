@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useState, useCallback, useEffect} from 'react';
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import styled from "@mui/material/styles/styled";
-import InfoButton from "./Components/InfoButton";
+import { SvgIcon } from '../SvgIcon';
 import MicButton from "./Components/MicButton";
 import CameraButton from "./Components/CameraButton";
 import OptionButton from "./Components/OptionButton";
@@ -30,7 +30,35 @@ const CustomizedGrid = styled(Grid)(({ theme }) => ({
 }));
 function Footer(props) {
   const { id } = useParams();
+  const [recording, setRecording] = useState(false)
   const conference = React.useContext(ConferenceContext);
+
+  const checkIsRecording = useCallback(() => {
+    if(conference.allowCamera) return;
+    fetch('https://gestion.veropo.com:5443/api/check_recording?stream_id='+conference.host.split("_")[0])
+    .then(async response => {
+      await response.json();
+      if (!response.ok) {
+          setRecording(false)
+      }else{
+        setRecording(true)
+      }
+  })
+  .catch(error => {
+      setRecording(false);
+      console.error('There was an error!', error);
+  });
+  
+  },[conference.host])
+
+  useEffect(() => {
+    let intervalId = setInterval(checkIsRecording, 5000)
+    return(() => {
+        clearInterval(intervalId)
+    })
+  },[checkIsRecording])
+
+
     return (
         <CustomizedGrid
             container
@@ -38,12 +66,13 @@ function Footer(props) {
             justifyContent={{xs: "center", sm: "space-between"}}
         >
           <Grid item sx={{display: {xs: "none", sm: "block"}}}>
-            <Grid container  id="levitate-info" alignItems={"center"}>
-              <InfoButton/> 
+            {recording && <Grid container  id="levitate-info" alignItems={"center"}>
+              <SvgIcon size={28} color={recording?'red':'white'} name={'video-record'} />
               <Typography variant="body1">
-                Sala: {id}
+                La sesion esta siendo grabada.
               </Typography>
             </Grid>
+          }
           </Grid>
               <Grid item>
                 <Grid

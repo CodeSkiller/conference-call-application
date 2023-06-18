@@ -5,6 +5,7 @@ import Typography from "@mui/material/Typography";
 import { styled } from "@mui/material/styles";
 import { SvgIcon } from "./SvgIcon";
 import { ConferenceContext } from "pages/AntMedia";
+import Button from "@mui/material/Button";
 
 const ParticipantName = styled(Typography)(({ theme }) => ({
   color: "#ffffff",
@@ -12,11 +13,16 @@ const ParticipantName = styled(Typography)(({ theme }) => ({
   fontSize: 14,
 }));
 
+const PinBtn = styled(Button)(({ theme }) => ({
+  "&:hover": {
+    backgroundColor: "#62a8ea",
+  },
+}));
 
 function ParticipantTab(props) {
   const conference = React.useContext(ConferenceContext);
 
-  const getParticipantItem = (videoId, name) => {
+  const getParticipantItem = (videoId, name, isMicMuted) => {
     return (
       <Grid
         key={videoId}
@@ -27,8 +33,19 @@ function ParticipantTab(props) {
         sx={{ borderColor: "primary.main" }}
       >
         <Grid item sx={{ pr: 1 }}>
-          <ParticipantName variant="body1">{name.replace("H0s999", "")}</ParticipantName>
+          <ParticipantName variant="body1">{name.split("QZh01")[0]}</ParticipantName>
         </Grid>
+        {
+        conference.allowCamera && videoId!=="localVideo" && 
+          <Grid item>
+              <PinBtn
+                sx={{ minWidth: "unset", pt: 1, pb: 1 }}
+                onClick={() => conference.turnOffYourMicNotification(videoId)}
+              >
+                <SvgIcon size={28} name={!isMicMuted ? "microphone" : "muted-microphone"} color="#fff" />
+              </PinBtn>
+          </Grid>
+        }
 
       </Grid>
     );
@@ -46,9 +63,10 @@ function ParticipantTab(props) {
               </ParticipantName>
             </Grid>
             {conference.isPlayOnly === false ? getParticipantItem("localVideo", "You") : ""}
-            {conference.allParticipants.map(({streamId, streamName}, index) => {
-              if (conference.publishStreamId !== streamId) {
-                return getParticipantItem(streamId, streamName);
+            {conference.allParticipants.map((part, index) => {
+              if (conference.publishStreamId !== part.streamId) {
+                let pmic = conference.mic.find((m)=>m.eventStreamId===part.streamId)
+                return getParticipantItem(part.streamId, part.streamName.split("QZh01")[0], pmic?.isMicMuted??false);
               } else {
                 return "";
               }

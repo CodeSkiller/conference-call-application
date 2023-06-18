@@ -381,6 +381,15 @@ const MeetingRoom = React.memo((props) => {
 
   const conferenceHost = conference.participants.find((v) => v.id === conference.host);
 
+
+useEffect(() => {
+  if(!conference.allowCamera) return;
+  window.addEventListener('beforeunload', (event) => {
+    event.returnValue = '';
+  });
+}, [conference.allowCamera])
+
+
   return (
         <>
           <div>
@@ -407,7 +416,6 @@ const MeetingRoom = React.memo((props) => {
                               autoPlay
                               name="Tu"
                               muted
-                              pinned
                           />
                         </div>
                     ) : (
@@ -418,7 +426,6 @@ const MeetingRoom = React.memo((props) => {
                                   track={conferenceHost.track}
                                   autoPlay
                                   name={conferenceHost.name?.replace("H0s999", "")}
-                                  pinned
                                   noTransmission={true}
                               />
                             </div>
@@ -435,8 +442,8 @@ const MeetingRoom = React.memo((props) => {
                       )
                     )}
                     <div id="somewhere-else" style={{"display": "none"}}>{returnUnpinnedGallery()}</div>
-                    <div style={{"position": "fixed", "top":"15px", "left":"15px"}}>{returnListGallery()}</div>
-                    <div style={{"position": "fixed", "top":"15px", "right":"15px"}}>{returnHandsRaised()}</div>
+                    <div style={{"position": "fixed", "top":"15px", "left":"15px", "z-index": "9999"}}>{returnListGallery()}</div>
+                    <div style={{"position": "fixed", "top":"15px", "right":"15px", "z-index": "9999"}}>{returnHandsRaised()}</div>
 
                   </>
               )}

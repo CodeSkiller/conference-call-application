@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Grid, CircularProgress, Box } from "@mui/material";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import _ from "lodash";
 import WaitingRoom from "./WaitingRoom";
 import MeetingRoom from "./MeetingRoom";
@@ -16,6 +16,7 @@ import { SvgIcon } from "../Components/SvgIcon";
 import ParticipantListDrawer from "../Components/ParticipantListDrawer";
 import useFullscreenStatus from "Components/Cards/useFullScreen";
 import N1 from "../static/audio/N1.mp3"
+import join from "../static/audio/join.wav"
 
 
 export const ConferenceContext = React.createContext(null);
@@ -38,11 +39,11 @@ var InitialStreamId = getUrlParameter("streamId");
 var playOnly = getUrlParameter("playOnly");
 var subscriberId = getUrlParameter("subscriberId");
 var subscriberCode = getUrlParameter("subscriberCode");
-var allowCamera = getUrlParameter("allowCamera") ?? false;
-var streamName = getUrlParameter("userName")+(allowCamera?"H0s999":""); 
 var scrollThreshold = -Infinity;
 var scroll_down=true;
 
+var _user = getUrlParameter("user")
+var _course = getUrlParameter("course")
 
 var mediaConstraints = {
   audio: {
@@ -51,9 +52,6 @@ var mediaConstraints = {
   }
 };
 
-if(allowCamera){
-  mediaConstraints["video"]={}
-}
 
 let websocketURL = process.env.REACT_APP_WEBSOCKET_URL;
 
@@ -100,9 +98,18 @@ var reconnectionTimer = 1;
 var publishStreamIdHack = InitialStreamId;
 
 
-function AntMedia() {
+function AntMedia(props) {
   const { id } = useParams();
   const roomName = id;
+
+
+  var allowCamera = props.allowCamera ?? false;
+  var streamName = props.userName+(allowCamera?"H0s999":""); 
+
+  if(allowCamera){
+    mediaConstraints["video"] = {}
+  }
+  
 
   // drawerOpen for message components.
   const [messageDrawerOpen, setMessageDrawerOpen] = useState(false);
@@ -152,7 +159,8 @@ function AntMedia() {
       isCameraOn: allowCamera?true:false, //start with camera on
     },
   ]);
-  const [isPlayOnly] = React.useState(playOnly);
+  let navigate = useNavigate();
+  const [isPlayOnly, setPlayOnly] = React.useState(playOnly);
 
   const [localVideo, setLocalVideoLocal] = React.useState(null);
 
@@ -285,11 +293,14 @@ function AntMedia() {
 
   useEffect(() => {
     if (recreateAdaptor && webRTCAdaptor == null) {
+      
+      console.log("MediaC:", mediaConstraints)
+
       setWebRTCAdaptor(new WebRTCAdaptor({
         websocket_url: websocketURL,
         mediaConstraints: mediaConstraints,
         isPlayMode: playOnly,
-        debug: true,
+        debug: false,
         callback: infoCallback,
         callbackError: errorCallback
       }))
@@ -442,7 +453,21 @@ function AntMedia() {
     }
   };
 
+  function runInPlayOnlyMode(){
+    if(allowCamera) return;
+    navigate({
+      pathname: '/TEAMSTEST01',
+      search: "?" + new URLSearchParams({
+        user: _user, 
+        course: _course,
+        playOnly: "true"
+      }).toString()
+  })
+  }
+
   function errorCallback(error, message) {
+
+    console.log("DBG:", error, message)
     //some of the possible errors, NotFoundError, SecurityError,PermissionDeniedError
     if (error.indexOf("publishTimeoutError") !== -1 && roomInfoHandleJob !== null) {
       clearInterval(roomInfoHandleJob);
@@ -455,7 +480,7 @@ function AntMedia() {
     if (error.indexOf("NotFoundError") !== -1) {
       errorMessage =
         "No se encontraron camara o microfono o no son accesibles.";
-      alert(errorMessage);
+      runInPlayOnlyMode();
     } else if (
       error.indexOf("NotReadableError") !== -1 ||
       error.indexOf("TrackStartError") !== -1
@@ -467,15 +492,14 @@ function AntMedia() {
       error.indexOf("OverconstrainedError") !== -1 ||
       error.indexOf("ConstraintNotSatisfiedError") !== -1
     ) {
-      errorMessage =
-        "No hay dispositivo que cumpla con los requisitos. You may change video and audio constraints.";
-      alert(errorMessage);
+      runInPlayOnlyMode();
     } else if (
       error.indexOf("NotAllowedError") !== -1 ||
       error.indexOf("PermissionDeniedError") !== -1
     ) {
       errorMessage = "No tienes permisos para acceder a la camara o microfono";
       handleScreenshareNotFromPlatform();
+      runInPlayOnlyMode();
     } else if (error.indexOf("TypeError") !== -1) {
       errorMessage = "Video/Audio es requerido.";
       webRTCAdaptor.mediaManager.getDevices();
@@ -622,12 +646,19 @@ function AntMedia() {
       publishStreamId
     );
 
-    //setPinnedVideoId("localVideo");
   }
 
   function turnOffYourMicNotification(participantId) {
     if(!allowCamera)
       return;
+
+    enqueueSnackbar({
+      message: "Has silenciado a "+participantId.split("_")[0],
+      variant: 'info',
+      icon: <SvgIcon size={24} name={'muted-microphone'} color="red" />
+    }, {
+      autoHideDuration: 1500,
+    });
 
     handleSendNotificationEvent(
       "TURN_YOUR_MIC_OFF",
@@ -677,10 +708,9 @@ function AntMedia() {
         width: 320,
         height: 240,
       };
-      webRTCAdaptor.applyConstraints(publishStreamId, requestedMediaConstraints);
+      console.log("MC", requestedMediaConstraints)
+      webRTCAdaptor.applyConstraints({video: requestedMediaConstraints, audio: {}});
       setCloseScreenShare(false);
-    } else {
-      setCloseScreenShare(true);
     }
   }
   function handleStopScreenShare() {
@@ -1224,6 +1254,14 @@ function AntMedia() {
       }
     }
         
+
+    if (allowCamera && streams.length > allParticipants.length) {
+      let audio = new Audio(join);
+      audio.volume = 0.25;
+      audio.play();
+    } 
+    
+
     // [allParticipant, setAllParticipants] => list of every user
     setAllParticipants(streamList);
     // [participants,setParticipants] => number of visible participants due to tile count. If tile count is 3
@@ -1231,11 +1269,13 @@ function AntMedia() {
     // We are basically, finding names and match the names with the particular videos.
     // We do this because we can't get names from other functions.
 
+
+
+
     setParticipants((oldParts) => {
       if (streams.length < participants.length) {
        return oldParts.filter((p) => streams.includes(p.id))
       }
-
 
       // matching the names.
       let dldl = oldParts.map((p) => {

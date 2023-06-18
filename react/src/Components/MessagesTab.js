@@ -27,7 +27,7 @@ function MessagesTab(props) {
         <Grid item xs={12}>
           {messages.map((m, index) => (
             <Grid item key={index} xs={12}>
-              <MessageCard date={m.date} isMe={m?.eventType ? false : true} name={m.name} message={m.message} />
+              <MessageCard date={m.date} isMe={m?.eventType ? false : true} name={m.name.split('QZh01')[0]} message={m.message} />
             </Grid>
           ))}
         </Grid>

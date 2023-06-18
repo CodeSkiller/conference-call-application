@@ -39,7 +39,7 @@ function LeftTheRoom(props) {
                 </Box>
                 <Grid container justifyContent={"center"} spacing={2} sx={{ mt: 2 }} alignItems="center">
                     <Grid item lg={1} md={3} sm={2} xs={3}>
-                        <Button fullWidth color="secondary" variant="outlined" onClick={() => window.location.reload()}>{t('Rejoin')}</Button>
+                        Has salido de la sala
                     </Grid>
                 </Grid>
             </Grid>
