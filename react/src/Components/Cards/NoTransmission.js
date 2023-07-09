@@ -2,7 +2,7 @@ import React from "react";
 import { Grid, CircularProgress, Box } from "@mui/material";
 import { ConferenceContext } from 'pages/AntMedia';
 
-function NoTransmission() {
+function NoTransmission({msg, loading}) {
   const conference = React.useContext(ConferenceContext);
 
   return (
@@ -25,8 +25,8 @@ function NoTransmission() {
         {
           conference.host? 
           <>
-            Cargando, espere un momento.
-            <Grid
+            {msg??""}
+            {loading && <Grid
                 container
                 spacing={0}
                 justifyContent="center"
@@ -34,7 +34,7 @@ function NoTransmission() {
                 <Box sx={{ display: 'flex' }}>
                   <CircularProgress size="4rem" />
                 </Box>
-              </Grid> 
+              </Grid> }
           </> : (conference.allParticipants.length>0 ? <> Parece que el profesor aun no ha iniciado la clase.</> : <>Parece que no hay nadie mas en la sala.</>)
         }
       </Grid>

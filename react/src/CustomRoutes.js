@@ -4,7 +4,7 @@ import { Routes, Route } from "react-router-dom";
 import Error from "pages/Error";
 import Home from "pages/Home";
 import AntMedia from "pages/AntMedia";
-import { getUrlParameter } from "@antmedia/webrtc_adaptor/dist/fetch.stream";
+import { getUrlParameter } from "@antmedia/webrtc_adaptor";
 import { Grid, CircularProgress, Box } from "@mui/material";
 
 function CustomRoutes(props) {

@@ -34,7 +34,6 @@ function WaitingRoom() {
     if(!conference.isPlayOnly &&conference.initialized) {
       conference.setLocalVideo(document.getElementById("localVideo"));
     }
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conference.initialized]);
 
@@ -61,7 +60,7 @@ function WaitingRoom() {
           autoHideDuration: 1500,
         }
       );
-      return;
+      //return;
     }
     var generatedStreamId = conference.streamName.replace(/[\W_]/g, "") + "_" + makeid(10);
     
@@ -163,7 +162,10 @@ function WaitingRoom() {
                       fontWeight={"400"}
                       style={{fontSize: 18}}
                   >
-                    Gracias por atender a la clase de hoy!
+                    Gracias por acudir a la clase de hoy en directo!
+                    <br/>
+                    <br/>
+                    Avisarte que la clase va a ser grabada. Gracias.
                   </Typography>
                 </Grid>
 

@@ -381,7 +381,6 @@ const MeetingRoom = React.memo((props) => {
 
   const conferenceHost = conference.participants.find((v) => v.id === conference.host);
 
-
 useEffect(() => {
   if(!conference.allowCamera) return;
   window.addEventListener('beforeunload', (event) => {
@@ -436,14 +435,14 @@ useEffect(() => {
                               style={{ height: "100%" }}
                               container
                             >
-                              <NoTransmission />
+                              <NoTransmission msg="Cargando, espere un momento." loading={true} />
                             </Grid>
                           </div>
                       )
                     )}
                     <div id="somewhere-else" style={{"display": "none"}}>{returnUnpinnedGallery()}</div>
-                    <div style={{"position": "fixed", "top":"15px", "left":"15px", "z-index": "9999"}}>{returnListGallery()}</div>
-                    <div style={{"position": "fixed", "top":"15px", "right":"15px", "z-index": "9999"}}>{returnHandsRaised()}</div>
+                    <div style={{"position": "fixed", "top":"15px", "left":"15px", "zIndex": "9999"}}>{returnListGallery()}</div>
+                    <div style={{"position": "fixed", "top":"15px", "right":"15px", "zIndex": "9999"}}>{returnHandsRaised()}</div>
 
                   </>
               )}

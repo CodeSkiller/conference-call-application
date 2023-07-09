@@ -4,6 +4,10 @@ import { styled } from '@mui/material/styles';
 import { SvgIcon } from '../../SvgIcon';
 import { Tooltip } from '@mui/material';
 import { ConferenceContext } from 'pages/AntMedia';
+import grabacion_iniciada from "../../../static/audio/grabacion-iniciada.mp3"
+import grabacion_detenida from "../../../static/audio/grabacion-detenida.mp3"
+import { useSnackbar } from "notistack";
+
 
 const CustomizedBtn = styled(Button)(({ theme }) => ({
   '&.footer-icon-button':{
@@ -23,13 +27,18 @@ const CustomizedBtn = styled(Button)(({ theme }) => ({
 function RecordButton({ footer, ...props }) {
     const conference = React.useContext(ConferenceContext);
     const [recording, setRecording] = useState(false)
+    const [btnBlock, setBtnBlock] = useState(false);
+    const [init, setInit] = useState(false);
+
+    const { enqueueSnackbar } = useSnackbar();
+
 
     const checkIsRecording = useCallback(() => {
       fetch('https://gestion.veropo.com:5443/api/check_recording?stream_id='+conference.streamName)
       .then(async response => {
         await response.json();
         if (!response.ok) {
-            setRecording(false)
+          setRecording(false)
         }else{
           setRecording(true)
         }
@@ -37,11 +46,23 @@ function RecordButton({ footer, ...props }) {
     .catch(error => {
         setRecording(false);
         console.error('There was an error!', error);
-    });
+    }); 
     
-    },[conference.streamName])
+    }, [conference.streamName]);
 
     const toggleRecording = async () => {
+      if(btnBlock){
+        enqueueSnackbar({
+          message: "Espere un momento para iniciar o deneter la grabacion nuevamente.",
+          variant: 'info',
+          icon: <SvgIcon size={24} name={'video-record'} color="#fff" />
+        }, {
+          autoHideDuration: 1500,
+        });
+        return
+      }
+      setBtnBlock(true);
+      setTimeout(()=>{setBtnBlock(false)}, 2000);
       fetch("https://gestion.veropo.com:5443/api/record_video", {
         method: "POST",
         headers: {
@@ -58,12 +79,44 @@ function RecordButton({ footer, ...props }) {
       });
     }
 
+    useEffect(()=>{
+      if(!init){setInit(true); return;}
+      if(recording){
+        let audio = new Audio(grabacion_iniciada);
+        audio.volume = 1;
+        audio.play();
+
+        enqueueSnackbar({
+          message: "Se ha iniciado la grabacion.",
+          variant: 'info',
+          icon: <SvgIcon size={24} name={'video-record'} color="#fff" />
+        }, {
+          autoHideDuration: 1500,
+        });
+
+      }else{
+        let audio = new Audio(grabacion_detenida);
+        audio.volume = 1;
+        audio.play();
+
+        enqueueSnackbar({
+          message: "Se ha detenido la grabacion.",
+          variant: 'info',
+          icon: <SvgIcon size={24} name={'video-record'} color="#fff" />
+        }, {
+          autoHideDuration: 1500,
+        });
+      }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [recording]);
+
     useEffect(() => {
-      let intervalId = setInterval(checkIsRecording, 5000)
+      let intervalId = setInterval(()=>{checkIsRecording()}, 5000);
       return(() => {
           clearInterval(intervalId)
       })
-  },[checkIsRecording])
+  }, [checkIsRecording])
+
     return (
             <Tooltip title={(!recording ? "Inciar" : "Detener")+' grabacion'} placement="top">
                 <CustomizedBtn

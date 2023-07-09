@@ -11,7 +11,6 @@ import MessageButton from "./Components/MessageButton";
 import ParticipantListButton from "./Components/ParticipantListButton";
 import EndCallButton from "./Components/EndCallButton";
 import TimeZone from "./Components/TimeZone";
-import { useParams } from "react-router-dom";
 import { ConferenceContext } from 'pages/AntMedia';
 import ReconnectButton from './Components/ReconnectButton';
 import RecordButton from './Components/RecordButton';
@@ -29,12 +28,11 @@ const CustomizedGrid = styled(Grid)(({ theme }) => ({
   height: 80,
 }));
 function Footer(props) {
-  const { id } = useParams();
   const [recording, setRecording] = useState(false)
   const conference = React.useContext(ConferenceContext);
 
   const checkIsRecording = useCallback(() => {
-    if(conference.allowCamera) return;
+    if(conference.allowCamera || !conference.host) return;
     fetch('https://gestion.veropo.com:5443/api/check_recording?stream_id='+conference.host.split("_")[0])
     .then(async response => {
       await response.json();
@@ -49,14 +47,14 @@ function Footer(props) {
       console.error('There was an error!', error);
   });
   
-  },[conference.host])
+  },[conference.host, conference.allowCamera])
 
   useEffect(() => {
     let intervalId = setInterval(checkIsRecording, 5000)
     return(() => {
         clearInterval(intervalId)
     })
-  },[checkIsRecording])
+  }, [checkIsRecording])
 
 
     return (

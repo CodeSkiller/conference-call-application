@@ -62,7 +62,8 @@ const VideoCard = memo(({ srcObject, hidePin, onHandlePin, noTransmission, ...pr
   }, [props.track]);
 
   let isOff = conference?.cam?.find(
-    (c) => c.eventStreamId === props?.id && !c?.isCameraOn
+    (c) => {
+      return c.eventStreamId === props?.id && !c?.isCameraOn}
   );
 
   // if i sharing my screen.
@@ -139,7 +140,7 @@ const VideoCard = memo(({ srcObject, hidePin, onHandlePin, noTransmission, ...pr
             style={{ height: "100%" }}
             container
           >
-            {noTransmission ? <NoTransmission /> : <DummyCard />}
+            {noTransmission ? <NoTransmission msg="El profesor no esta transmitiendo." loading={false}/> : <DummyCard />}
             
           </Grid>
 
